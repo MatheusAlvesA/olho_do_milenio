@@ -1,4 +1,5 @@
 import React, { Component } from 'react';
+import "./App.css"
 
 class App extends Component {
 
@@ -9,12 +10,40 @@ class App extends Component {
 
 	getCartas = async busca => {
 		return [{
-			titulo: 'Titulo',
-			codigo: 'aaa',
-			url_imagem_carta: 'imagem', 
-			data_hora_inserido: 'hora',
+			titulo: 'The Winged Dragon of Ra',
+			codigo: 'LC01-EN003',
+			url_imagem_carta: 'https://www.solosagrado.com.br/images/produtos/w200/h292/19318.jpg', 
+			data_hora_inserido: '2019/11/24',
 			mais_recente: true,
-			url_carta: 'url carta'
+			url_carta: 'https://www.solosagrado.com.br/Yugioh-Cards/19318/The-Winged-Dragon-of-Ra-LC01-EN003'
+		},{
+			titulo: 'Stardust Dragon',
+			codigo: 'SHSP-ENSE1',
+			url_imagem_carta: 'https://www.solosagrado.com.br/images/produtos/w200/h292/29217.jpg', 
+			data_hora_inserido: '2019/11/24',
+			mais_recente: true,
+			url_carta: 'https://www.solosagrado.com.br/Yugioh-Cards/29217/Stardust-Dragon-SHSP-ENSE1'
+		},{
+			titulo: 'Black Luster Soldier - Envoy of the Beginning',
+			codigo: 'CT10-EN005',
+			url_imagem_carta: 'https://www.solosagrado.com.br/images/produtos/w200/h292/28304.jpg', 
+			data_hora_inserido: '2019/11/24',
+			mais_recente: true,
+			url_carta: 'https://www.solosagrado.com.br/Yugioh-Cards/28304/Black-Luster-Soldier---Envoy-of-the-Beginning-CT10-EN005'
+		},{
+			titulo: 'The Seal of Orichalcos',
+			codigo: 'LC03-EN001',
+			url_imagem_carta: 'https://www.solosagrado.com.br/images/produtos/w200/h292/24545.jpg', 
+			data_hora_inserido: '2019/11/24',
+			mais_recente: true,
+			url_carta: 'https://www.solosagrado.com.br/Yugioh-Cards/24545/The-Seal-of-Orichalcos-LC03-EN001-'
+		},{
+			titulo: 'Blue-Eyes White Dragon',
+			codigo: 'SDK-001',
+			url_imagem_carta: 'https://www.solosagrado.com.br/images/produtos/w200/h292/2184.jpg', 
+			data_hora_inserido: '2019/11/24',
+			mais_recente: true,
+			url_carta: 'https://www.solosagrado.com.br/Yugioh-Cards/2184/Blue-Eyes-White-Dragon-SDK-001'
 		}]
 	}
 
@@ -90,8 +119,11 @@ class App extends Component {
 				</div>
 		</div>
 		<div
-			className="d-flex flex-column justify-content-center align-items-center"
-			style={{height: '90%', width: '100%'}}
+			style={{
+					height: '90%',
+					width: '100%',
+					overflowY: 'scroll'
+				}}
 		>
 			{
 				(this.state.dados.length > 0)
@@ -136,15 +168,27 @@ class App extends Component {
 	}
 
 	getCard(infos) {
-		return <div key={infos.titulo+infos.codigo}>
-			{
-			infos.titulo
-			+infos.codigo
-			+infos.url_imagem_carta
-			+infos.data_hora_inserido
-			+infos.mais_recente
-			+infos.url_carta
-			}
+		return <div
+					key={infos.titulo+infos.codigo}
+					className="w-100 d-flex carta"
+					onClick={() => window.open(infos.url_carta, '_blank')}
+				>
+					<img
+						src={infos.url_imagem_carta}
+						alt="Imagem Carta"
+						height="100%"
+						style={{ float: 'left' }}
+					/>
+					<div
+						style={{
+							width: "auto",
+							height: "100%",
+							marginLeft: "20px",
+							wordBreak: "break-all"
+						}}
+					>
+						<h4>{infos.titulo}<span className="text-muted">{" "+infos.codigo}</span> </h4>
+					</div>
 		</div>;
 	}
 }

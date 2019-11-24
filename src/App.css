@@ -1,0 +1,11 @@
+.carta {
+	height: 30%;
+	cursor: pointer;
+	margin-top: 20px;
+	border-bottom: 1px solid gray;
+	padding-bottom: 5px;
+}
+
+.carta:hover {
+	border-bottom: 1px dashed #0269A4;
+}
