@@ -5,67 +5,52 @@ class App extends Component {
 
 	state = {
 		busca: '',
+		notFound: false,
 		dados: []
 	}
 
 	getCartas = async busca => {
-		return [{
-			titulo: 'The Winged Dragon of Ra',
-			codigo: 'LC01-EN003',
-			url_imagem_carta: 'https://www.solosagrado.com.br/images/produtos/w200/h292/19318.jpg', 
-			data_hora_inserido: '2019/11/24',
-			mais_recente: true,
-			url_carta: 'https://www.solosagrado.com.br/Yugioh-Cards/19318/The-Winged-Dragon-of-Ra-LC01-EN003'
-		},{
-			titulo: 'Stardust Dragon',
-			codigo: 'SHSP-ENSE1',
-			url_imagem_carta: 'https://www.solosagrado.com.br/images/produtos/w200/h292/29217.jpg', 
-			data_hora_inserido: '2019/11/24',
-			mais_recente: true,
-			url_carta: 'https://www.solosagrado.com.br/Yugioh-Cards/29217/Stardust-Dragon-SHSP-ENSE1'
-		},{
-			titulo: 'Black Luster Soldier - Envoy of the Beginning',
-			codigo: 'CT10-EN005',
-			url_imagem_carta: 'https://www.solosagrado.com.br/images/produtos/w200/h292/28304.jpg', 
-			data_hora_inserido: '2019/11/24',
-			mais_recente: true,
-			url_carta: 'https://www.solosagrado.com.br/Yugioh-Cards/28304/Black-Luster-Soldier---Envoy-of-the-Beginning-CT10-EN005'
-		},{
-			titulo: 'The Seal of Orichalcos',
-			codigo: 'LC03-EN001',
-			url_imagem_carta: 'https://www.solosagrado.com.br/images/produtos/w200/h292/24545.jpg', 
-			data_hora_inserido: '2019/11/24',
-			mais_recente: true,
-			url_carta: 'https://www.solosagrado.com.br/Yugioh-Cards/24545/The-Seal-of-Orichalcos-LC03-EN001-'
-		},{
-			titulo: 'Blue-Eyes White Dragon',
-			codigo: 'SDK-001',
-			url_imagem_carta: 'https://www.solosagrado.com.br/images/produtos/w200/h292/2184.jpg', 
-			data_hora_inserido: '2019/11/24',
-			mais_recente: true,
-			url_carta: 'https://www.solosagrado.com.br/Yugioh-Cards/2184/Blue-Eyes-White-Dragon-SDK-001'
-		}]
+		const conf = {
+						method: 'GET',
+						mode: 'cors',
+						cache: 'default'
+					};
+		const r = await fetch(`https://cors-anywhere.herokuapp.com/http://api.olhodomilenio.matheusalves.com.br/cards?nome=${busca}&query_size=20`, conf);
+		return await r.json();
 	}
 
 	sincronizando = false;
-	sincronizar = () => {
+	sincronizar = async () => {
 		if(this.sincronizando)
 			return;
 		this.sincronizando = true;
-		return new Promise((res, rej) => {
-			const { busca } = this.state;
-			this.setState({dados: []}, async () => {
-				const dados = await this.getCartas(busca);
+
+		const { busca } = this.state;
+		try {
+			const dados = await this.getCartas(busca);
+			if(dados.length <= 0)
+				this.setState({notFound: true}, () => {
+					this.sincronizando = false;
+				});
+			else
 				this.setState({dados}, () => {
 					this.sincronizando = false;
-					res();
 				});
-			})
-		});
+		} catch {
+			this.sincronizando = false;
+		}
 	}
 
+	queuedSync = null;
 	handleChange = busca => {
-		this.setState({busca}, this.sincronizar)
+		this.setState({busca, dados: [], notFound: false}, () => {
+			if(this.queuedSync !== null)
+				clearInterval(this.queuedSync);
+			this.queuedSync = setTimeout(() => {
+				this.queuedSync = null;
+				this.sincronizar();
+			}, 1000);
+		});
 	}
 
 	render() {
@@ -126,9 +111,13 @@ class App extends Component {
 				}}
 		>
 			{
-				(this.state.dados.length > 0)
-				? this.state.dados.map(this.getCard)
-				: <img src={require('./loading.gif')} alt="Loading" />
+				(this.state.notFound)
+				? <h2>Nada encontrado :(</h2>
+				: (
+					(this.state.dados.length > 0)
+					? this.state.dados.map(this.getCard)
+					: <img src={require('./loading.gif')} alt="Loading" />
+				)
 			}
 		</div>
 		</div>;
@@ -169,7 +158,7 @@ class App extends Component {
 
 	getCard(infos) {
 		return <div
-					key={infos.titulo+infos.codigo}
+					key={infos.id}
 					className="w-100 d-flex carta"
 					onClick={() => window.open(infos.url_carta, '_blank')}
 				>
@@ -181,13 +170,29 @@ class App extends Component {
 					/>
 					<div
 						style={{
-							width: "auto",
+							width: "50%",
 							height: "100%",
 							marginLeft: "20px",
 							wordBreak: "break-all"
 						}}
 					>
-						<h4>{infos.titulo}<span className="text-muted">{" "+infos.codigo}</span> </h4>
+						<h4>{infos.titulo}<br /><span className="text-muted">{infos.estoque}</span> </h4>
+					</div>
+					<div
+						className="d-flex flex-column justify-content-around align-items-center"
+						style={{
+								width: "20%",
+								height: "100%",
+						}}
+					>
+						<h4
+							style={{
+								textAlign: 'right',
+								color: 'seagreen'
+							}}
+						>
+							R${infos.preco}
+						</h4>
 					</div>
 		</div>;
 	}
