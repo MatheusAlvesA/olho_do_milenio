@@ -16,7 +16,7 @@ class App extends Component {
 						cache: 'default'
 					};
 		const r = await fetch(`https://cors-anywhere.herokuapp.com/http://api.olhodomilenio.matheusalves.com.br/cards?nome=${busca}&query_size=20`, conf);
-		return await r.json();
+		return (await r.json()).results;
 	}
 
 	sincronizando = false;
